@@ -5,7 +5,15 @@ export interface RuleFailure {
   name: string;
   severity: "blocker" | "warning";
   fix: string;
+  /** DOR-4 only: the unresolved dependency behind this failure. */
+  dependsOn?: string;
+  description?: string;
+  /** DOR-4 only: true when the dependency lives in a different tracker than the story. */
+  crossTool?: boolean;
 }
+
+/** Tracker lookup for a story key, or undefined for external keys such as SEC-12. */
+export type TrackerOfKey = (key: string) => string | undefined;
 
 export interface StoryCheck {
   key: string;
@@ -28,14 +36,34 @@ const predicates: Record<string, (s: Story) => boolean> = {
   "DOR-5": (s) => !s.hasUi || (s.designLink !== null && s.designLink !== ""),
 };
 
-export function checkStory(story: Story, rules: DorRule[]): StoryCheck {
+export function checkStory(
+  story: Story,
+  rules: DorRule[],
+  trackerOfKey: TrackerOfKey = () => undefined,
+  storyTracker?: string,
+): StoryCheck {
   const failures: RuleFailure[] = rules
     .filter((r) => {
       const p = predicates[r.id];
       if (!p) throw new Error(`No evaluator for rule ${r.id}`);
       return !p(story);
     })
-    .map((r) => ({ ruleId: r.id, name: r.name, severity: r.severity, fix: r.fix }));
+    .flatMap((r) => {
+      const base = { ruleId: r.id, name: r.name, severity: r.severity, fix: r.fix };
+      if (r.id !== "DOR-4") return [base];
+      // One failure per unresolved dependency, so the reader sees what is blocking and where it lives.
+      return story.dependencies
+        .filter((d) => !d.resolved)
+        .map((d) => {
+          const depTracker = trackerOfKey(d.key);
+          return {
+            ...base,
+            dependsOn: d.key,
+            description: d.description,
+            crossTool: depTracker !== undefined && depTracker !== storyTracker,
+          };
+        });
+    });
   const blockers = failures.filter((f) => f.severity === "blocker");
   return {
     key: story.key,
@@ -60,8 +88,10 @@ export function summarizeReadiness(
   stories: Story[],
   rules: DorRule[],
   completedVelocity: number[],
+  trackerOfKey?: TrackerOfKey,
+  storyTracker?: string,
 ): ReadinessSummary {
-  const checks = stories.map((s) => checkStory(s, rules));
+  const checks = stories.map((s) => checkStory(s, rules, trackerOfKey, storyTracker));
   const committedPoints = checks.reduce((n, c) => n + (c.storyPoints ?? 0), 0);
   const readyPoints = checks.filter((c) => c.ready).reduce((n, c) => n + (c.storyPoints ?? 0), 0);
   const avgVelocity = completedVelocity.length

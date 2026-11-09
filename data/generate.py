@@ -257,6 +257,24 @@ def evaluate(s):
     return fails
 
 blockers = {"DOR-2", "DOR-3", "DOR-4", "DOR-5"}
+PREFIX_TEAM = {"PLT": "platform", "MOB": "mobile", "DAT": "data"}
+TRACKER = {t["key"]: t["tracker"] for t in out["teams"]}
+
+
+def dependency_blockers(s):
+    """DOR-4 detail: one entry per unresolved dependency. crossTool is true when the dependency
+    lives in a different tracker than the story. Keys with no team (e.g. SEC-12) are external: false."""
+    mine = TRACKER[s["teamKey"]]
+    res = []
+    for d in s["dependencies"]:
+        if d["resolved"]:
+            continue
+        dep_tracker = TRACKER.get(PREFIX_TEAM.get(d["key"].split("-")[0]))
+        res.append({"rule": "DOR-4", "dependsOn": d["key"], "description": d["description"],
+                    "crossTool": dep_tracker is not None and dep_tracker != mine})
+    return res
+
+
 expected = {}
 for t in out["teams"]:
     k = t["key"]
@@ -270,6 +288,7 @@ for t in out["teams"]:
     v = velocity[k]
     avg = sum(x["completed"] for x in v.values()) / len(v)
     expected[k] = {"stories": len(ss), "notReady": notready, "warningsOnly": warn, "failures": {kk: f for kk, f in res.items() if f},
+                   "dependencyBlockers": {s["key"]: dependency_blockers(s) for s in ss if "DOR-4" in res[s["key"]]},
                    "committedPoints": pts, "readyPoints": sum(s["storyPoints"] for s in ss if s["key"] not in notready),
                    "avgVelocity": avg, "commitPctOfVelocity": round(100 * pts / avg), "rawHours": hours, "focusHours": focus}
 with open(os.path.join(OUT, "expected-answers.json"), "w") as f:

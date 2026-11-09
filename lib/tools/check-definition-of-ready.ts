@@ -1,14 +1,22 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/server";
-import { dorRules, getSprint, getStories, getTeam, priorCompletedVelocity } from "@/lib/data";
-import { summarizeReadiness } from "@/lib/rules/dor";
+import { dorRules, getSprint, getStories, getTeam, priorCompletedVelocity, trackerOfKey } from "@/lib/data";
+import { summarizeReadiness, type RuleFailure } from "@/lib/rules/dor";
 import { json, toolError } from "./result";
+
+/** Trim a failure for the client. DOR-4 failures also say which dependency blocks and whether it is cross-tool. */
+const trimFailure = (f: RuleFailure) => ({
+  rule: f.ruleId,
+  name: f.name,
+  fix: f.fix,
+  ...(f.dependsOn !== undefined && { dependsOn: f.dependsOn, description: f.description, crossTool: f.crossTool }),
+});
 
 export async function checkDefinitionOfReady(team: string, sprint: string) {
   const t = getTeam(team);
   const s = getSprint(sprint);
   const [stories, velocity] = await Promise.all([getStories(t, s), priorCompletedVelocity(t, s)]);
-  const summary = summarizeReadiness(stories, dorRules(), velocity);
+  const summary = summarizeReadiness(stories, dorRules(), velocity, trackerOfKey, t.tracker);
   return {
     team: t.key,
     sprint: s.key,
@@ -19,8 +27,8 @@ export async function checkDefinitionOfReady(team: string, sprint: string) {
       title: c.title,
       storyPoints: c.storyPoints,
       ready: c.ready,
-      blockers: c.blockers.map((b) => ({ rule: b.ruleId, name: b.name, fix: b.fix })),
-      warnings: c.warnings.map((w) => ({ rule: w.ruleId, name: w.name, fix: w.fix })),
+      blockers: c.blockers.map(trimFailure),
+      warnings: c.warnings.map(trimFailure),
     })),
   };
 }

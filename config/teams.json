@@ -36,6 +36,7 @@
       "key": "platform",
       "name": "Platform",
       "tracker": "clickup",
+      "keyPrefix": "PLT",
       "clickup": {
         "folder": "Platform"
       },
@@ -86,6 +87,7 @@
       "key": "mobile",
       "name": "Mobile",
       "tracker": "azure-devops",
+      "keyPrefix": "MOB",
       "azureDevops": {
         "areaPath": "Northwind demo\\Mobile"
       },
@@ -136,6 +138,7 @@
       "key": "data",
       "name": "Data",
       "tracker": "clickup",
+      "keyPrefix": "DAT",
       "clickup": {
         "folder": "Data"
       },

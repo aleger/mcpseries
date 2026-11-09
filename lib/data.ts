@@ -20,6 +20,12 @@ export function getTeam(key: string): TeamConfig {
   return t;
 }
 
+/** Tracker that holds a story key (by its prefix), or undefined for keys outside both trackers. */
+export function trackerOfKey(key: string): string | undefined {
+  const prefix = key.split("-")[0].toUpperCase();
+  return config.teams.find((t) => t.keyPrefix === prefix)?.tracker;
+}
+
 export function getSprint(key: string): Sprint {
   const norm = key.toLowerCase().replace(/\s+/g, "-");
   const s = config.sprints.find((x) => x.key === norm);

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import expected from "@/data/expected-answers.json";
 import { checkDefinitionOfReady } from "@/lib/tools/check-definition-of-ready";
 import { getSprintCapacity } from "@/lib/tools/get-sprint-capacity";
+import { dependencyBlockersOf } from "../helpers";
 
 // Opt-in: npm run test:live. Calls the real adapters against the demo workspaces. Run after every seed.
 const teams = Object.keys(expected) as (keyof typeof expected)[];
@@ -23,5 +24,6 @@ describe.each(teams)("Sprint 24 (live trackers) – %s", (team) => {
     expect(r.readyPoints).toBe(exp.readyPoints);
     expect(r.avgVelocity).toBe(exp.avgVelocity);
     expect(r.commitPctOfVelocity).toBe(exp.commitPctOfVelocity);
+    expect(dependencyBlockersOf(r)).toEqual(exp.dependencyBlockers);
   });
 });

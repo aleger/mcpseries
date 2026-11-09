@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import { parseEnv } from "node:util";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import expected from "@/data/expected-answers.json";
+import { dependencyBlockersOf } from "../helpers";
 
 /**
  * Calls the tools through the real HTTP endpoint on a real Next server, so a problem that only exists in
@@ -87,6 +88,7 @@ describe.each(teams)("HTTP /mcp, Sprint 24 – %s", (team) => {
     expect(r.readyPoints).toBe(exp.readyPoints);
     expect(r.avgVelocity).toBe(exp.avgVelocity);
     expect(r.commitPctOfVelocity).toBe(exp.commitPctOfVelocity);
+    expect(dependencyBlockersOf(r)).toEqual(exp.dependencyBlockers);
   });
 
   it("get_sprint_capacity", async () => {

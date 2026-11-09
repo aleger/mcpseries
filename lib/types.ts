@@ -11,6 +11,8 @@ export interface TeamConfig {
   key: string;
   name: string;
   tracker: Tracker;
+  /** Story key prefix, e.g. MOB. Used to tell which tracker a dependency lives in. */
+  keyPrefix: string;
   clickup?: { folder: string };
   azureDevops?: { areaPath: string };
   members: Member[];

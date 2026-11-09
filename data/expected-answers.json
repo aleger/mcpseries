@@ -27,6 +27,16 @@
         "DOR-5"
       ]
     },
+    "dependencyBlockers": {
+      "PLT-107": [
+        {
+          "rule": "DOR-4",
+          "dependsOn": "SEC-12",
+          "description": "Security review of IdP config",
+          "crossTool": false
+        }
+      ]
+    },
     "committedPoints": 41,
     "readyPoints": 13,
     "avgVelocity": 28.0,
@@ -58,6 +68,16 @@
         "DOR-4"
       ]
     },
+    "dependencyBlockers": {
+      "MOB-210": [
+        {
+          "rule": "DOR-4",
+          "dependsOn": "DAT-307",
+          "description": "Delay prediction API from Data team",
+          "crossTool": true
+        }
+      ]
+    },
     "committedPoints": 26,
     "readyPoints": 15,
     "avgVelocity": 23.5,
@@ -80,6 +100,16 @@
       "DAT-307": [
         "DOR-3",
         "DOR-4"
+      ]
+    },
+    "dependencyBlockers": {
+      "DAT-307": [
+        {
+          "rule": "DOR-4",
+          "dependsOn": "DAT-302",
+          "description": "Telematics ingestion",
+          "crossTool": false
+        }
       ]
     },
     "committedPoints": 25,

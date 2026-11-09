@@ -1,5 +1,6 @@
 import { it } from "vitest";
 import expected from "@/data/expected-answers.json";
+import { dependencyBlockersOf } from "../helpers";
 import { checkDefinitionOfReady } from "@/lib/tools/check-definition-of-ready";
 
 // Prints live results next to expected-answers.json. Asserted in live.test.ts.
@@ -15,6 +16,7 @@ it("report", async () => {
       committed: `${r.committedPoints} vs ${e.committedPoints} [${same(r.committedPoints, e.committedPoints)}]`,
       ready: `${r.readyPoints} vs ${e.readyPoints} [${same(r.readyPoints, e.readyPoints)}]`,
       velocity: `${r.avgVelocity} vs ${e.avgVelocity} [${same(r.avgVelocity, e.avgVelocity)}]`,
+      dependencies: `${JSON.stringify(dependencyBlockersOf(r))} [${same(dependencyBlockersOf(r), e.dependencyBlockers)}]`,
       commitPct: `${r.commitPctOfVelocity} vs ${e.commitPctOfVelocity} [${same(r.commitPctOfVelocity, e.commitPctOfVelocity)}]`,
     });
   }
