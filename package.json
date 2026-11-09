@@ -13,7 +13,8 @@
     "start": "next start",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "push:clickup": "node --env-file=.env.local scripts/push-clickup.ts"
+    "push:clickup": "node --env-file=.env.local scripts/push-clickup.ts",
+    "push:ado": "node --env-file=.env.local scripts/push-ado.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.4.0",
