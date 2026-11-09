@@ -12,7 +12,8 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "push:clickup": "node --env-file=.env.local scripts/push-clickup.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.4.0",
