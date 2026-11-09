@@ -1,6 +1,6 @@
 import type { Sprint, Story, TeamConfig } from "@/lib/types";
 import type { TrackerAdapter } from "./types";
-import { cached, requireEnv, TrackerError } from "./http";
+import { cached, readJson, requireEnv, TrackerError } from "./http";
 import { KEY_RE, RELEASE_TAG_PREFIX, splitDescription } from "./parse";
 
 const BASE = "https://api.clickup.com/api/v2";
@@ -9,8 +9,7 @@ type Json = Record<string, any>;
 async function get(path: string): Promise<Json> {
   return cached(`clickup:${path}`, async () => {
     const res = await fetch(BASE + path, { headers: { Authorization: requireEnv("CLICKUP_API_TOKEN") } });
-    if (!res.ok) throw new TrackerError(`ClickUp request failed (${res.status}).`);
-    return (await res.json()) as Json;
+    return (await readJson(res, "ClickUp", "CLICKUP_API_TOKEN", "a personal API token")) as Json;
   });
 }
 

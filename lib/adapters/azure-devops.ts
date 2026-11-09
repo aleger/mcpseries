@@ -1,6 +1,6 @@
 import type { Sprint, Story, TeamConfig } from "@/lib/types";
 import type { TrackerAdapter } from "./types";
-import { cached, requireEnv, TrackerError } from "./http";
+import { cached, readJson, requireEnv, TrackerError } from "./http";
 import { htmlListItems, KEY_RE, RELEASE_TAG_PREFIX, splitAdoDescription } from "./parse";
 
 type Json = Record<string, any>;
@@ -16,8 +16,7 @@ async function call(method: "GET" | "POST", path: string, body?: unknown): Promi
     headers: { Authorization: auth, "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
   });
-  if (!res.ok) throw new TrackerError(`Azure DevOps request failed (${res.status}).`);
-  return (await res.json()) as Json;
+  return (await readJson(res, "Azure DevOps", "ADO_PAT", "needs Work Items (Read) and Project and Team (Read)")) as Json;
 }
 
 /** Work items under a team's area path in one sprint iteration. WIQL is read-only. */
