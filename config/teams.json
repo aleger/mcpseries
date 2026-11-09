@@ -1,0 +1,186 @@
+{
+  "_note": "Capacity inputs. Neither tracker exposes per-sprint capacity for demo personas, so capacity comes from here (source: config).",
+  "company": {
+    "name": "Northwind Logistics",
+    "focusFactor": 0.7,
+    "hoursPerDay": 6
+  },
+  "sprints": [
+    {
+      "key": "sprint-22",
+      "name": "Sprint 22",
+      "start": "2026-11-02",
+      "end": "2026-11-13",
+      "workingDays": 10,
+      "state": "closed"
+    },
+    {
+      "key": "sprint-23",
+      "name": "Sprint 23",
+      "start": "2026-11-16",
+      "end": "2026-11-27",
+      "workingDays": 9,
+      "state": "closed"
+    },
+    {
+      "key": "sprint-24",
+      "name": "Sprint 24",
+      "start": "2026-11-30",
+      "end": "2026-12-11",
+      "workingDays": 10,
+      "state": "planned"
+    }
+  ],
+  "teams": [
+    {
+      "key": "platform",
+      "name": "Platform",
+      "tracker": "clickup",
+      "clickup": {
+        "folder": "Platform"
+      },
+      "members": [
+        {
+          "name": "Priya Natarajan",
+          "role": "Tech Lead",
+          "hoursPerDay": 5,
+          "ptoDays": {
+            "sprint-24": 0
+          }
+        },
+        {
+          "name": "Marcus Bell",
+          "role": "Senior Engineer",
+          "hoursPerDay": 6,
+          "ptoDays": {
+            "sprint-24": 2
+          }
+        },
+        {
+          "name": "Elena Ruiz",
+          "role": "Engineer",
+          "hoursPerDay": 6,
+          "ptoDays": {
+            "sprint-24": 0
+          }
+        },
+        {
+          "name": "Tom Okafor",
+          "role": "Engineer",
+          "hoursPerDay": 6,
+          "ptoDays": {
+            "sprint-24": 5
+          }
+        },
+        {
+          "name": "Grace Lin",
+          "role": "QA Engineer",
+          "hoursPerDay": 6,
+          "ptoDays": {
+            "sprint-24": 0
+          }
+        }
+      ]
+    },
+    {
+      "key": "mobile",
+      "name": "Mobile",
+      "tracker": "azure-devops",
+      "azureDevops": {
+        "areaPath": "Northwind demo\\Mobile"
+      },
+      "members": [
+        {
+          "name": "Jordan Hayes",
+          "role": "Tech Lead",
+          "hoursPerDay": 5,
+          "ptoDays": {
+            "sprint-24": 0
+          }
+        },
+        {
+          "name": "Aisha Karim",
+          "role": "Senior iOS Engineer",
+          "hoursPerDay": 6,
+          "ptoDays": {
+            "sprint-24": 0
+          }
+        },
+        {
+          "name": "Ben Sorensen",
+          "role": "Android Engineer",
+          "hoursPerDay": 6,
+          "ptoDays": {
+            "sprint-24": 1
+          }
+        },
+        {
+          "name": "Lucia Romero",
+          "role": "Engineer",
+          "hoursPerDay": 6,
+          "ptoDays": {
+            "sprint-24": 0
+          }
+        },
+        {
+          "name": "Dev Patel",
+          "role": "QA Engineer",
+          "hoursPerDay": 6,
+          "ptoDays": {
+            "sprint-24": 3
+          }
+        }
+      ]
+    },
+    {
+      "key": "data",
+      "name": "Data",
+      "tracker": "clickup",
+      "clickup": {
+        "folder": "Data"
+      },
+      "members": [
+        {
+          "name": "Hannah Weiss",
+          "role": "Tech Lead",
+          "hoursPerDay": 5,
+          "ptoDays": {
+            "sprint-24": 0
+          }
+        },
+        {
+          "name": "Omar Haddad",
+          "role": "Data Engineer",
+          "hoursPerDay": 6,
+          "ptoDays": {
+            "sprint-24": 0
+          }
+        },
+        {
+          "name": "Sofia Mendes",
+          "role": "Data Engineer",
+          "hoursPerDay": 6,
+          "ptoDays": {
+            "sprint-24": 2
+          }
+        },
+        {
+          "name": "Kai Nakamura",
+          "role": "Analytics Engineer",
+          "hoursPerDay": 6,
+          "ptoDays": {
+            "sprint-24": 0
+          }
+        },
+        {
+          "name": "Rachel Adler",
+          "role": "QA Engineer",
+          "hoursPerDay": 6,
+          "ptoDays": {
+            "sprint-24": 0
+          }
+        }
+      ]
+    }
+  ]
+}

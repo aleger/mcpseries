@@ -27,14 +27,16 @@ Also a `dod://team/{team}` resource and a `sprint-readiness-review` prompt.
 
 ## Run locally
 
+The server reads live data from your ClickUp workspace and Azure DevOps project. It never writes to them.
+
 ```bash
 npm install
-npm test
+cp .env.example .env.local   # add ClickUp and Azure DevOps tokens and IDs
+npm run seed:clickup         # optional: build the Northwind demo in a test ClickUp space
+npm run seed:ado             # optional: build the Northwind demo in a test Azure DevOps project
 npm run dev
 npx @modelcontextprotocol/inspector   # connect to http://localhost:3000/mcp
 ```
-
-v0.1 reads the bundled Northwind JSON in `data/`. Postgres and Prisma seeding are not wired up yet.
 
 ## Connect to Claude
 
@@ -46,18 +48,18 @@ claude mcp add --transport http delivery-mcp https://<your-deployment>/mcp
 
 ## Auth
 
-v0.1 and v0.2 have no auth by design. They serve fictional demo data only. v0.3 adds OAuth with Clerk. Do not point v0.1 or v0.2 at real tracker data.
+v0.1 and v0.2 have no auth by design. Point them only at test workspaces with demo data. v0.3 adds OAuth with Clerk. Do not point v0.1 or v0.2 at real tracker data.
 
 ## Demo data
 
-Northwind Logistics is a fictional company: three teams, Sprint 22 to 24, four releases. See `data/`. One story contains a planted prompt injection for the security episode.
+Northwind Logistics is a fictional company: three teams, Sprints 22 to 24, four releases. Platform and Data run in ClickUp, Mobile runs in Azure DevOps. `data/northwind.json` is the seed source for the demo workspaces and the test fixtures. The server never reads it at runtime. One story contains a planted prompt injection for the security episode.
 
 ## Releases
 
 | Tag | Episode | Adds |
 | --- | --- | --- |
-| v0.1 | 1. Concept | Capacity and DoR tools on seeded data |
-| v0.2 | 2. Build | Release calendar, cross-tracker comparison, read-only adapters |
+| v0.1 | 1. Concept | Capacity and DoR tools on live ClickUp and Azure DevOps data |
+| v0.2 | 2. Build | Release calendar, cross-tracker comparison, resource, prompt |
 | v0.3 | 3. Govern | OAuth, audit log, evals |
 
 ## License

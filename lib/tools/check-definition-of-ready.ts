@@ -4,10 +4,11 @@ import { dorRules, getSprint, getStories, getTeam, priorCompletedVelocity } from
 import { summarizeReadiness } from "@/lib/rules/dor";
 import { json, toolError } from "./result";
 
-export function checkDefinitionOfReady(team: string, sprint: string) {
+export async function checkDefinitionOfReady(team: string, sprint: string) {
   const t = getTeam(team);
   const s = getSprint(sprint);
-  const summary = summarizeReadiness(getStories(t.key, s.key), dorRules(), priorCompletedVelocity(t.key, s.key));
+  const [stories, velocity] = await Promise.all([getStories(t, s), priorCompletedVelocity(t, s)]);
+  const summary = summarizeReadiness(stories, dorRules(), velocity);
   return {
     team: t.key,
     sprint: s.key,
@@ -39,7 +40,7 @@ export function registerCheckDefinitionOfReady(server: McpServer) {
     },
     async ({ team, sprint }) => {
       try {
-        return json(checkDefinitionOfReady(team, sprint));
+        return json(await checkDefinitionOfReady(team, sprint));
       } catch (e) {
         return toolError(e);
       }

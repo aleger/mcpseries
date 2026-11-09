@@ -171,6 +171,36 @@ for ss in stories.values():
             s["sprintKey"] = None
             s["status"] = "Backlog"
 
+# Closed-sprint history so velocity is computed from tracker data, not hardcoded.
+HIST_TITLES = {
+    "platform": ["Shipment v2 schema", "Partner key management", "Retry queue for webhooks", "Tracking cache", "Error budget alerts", "Carrier lookup endpoint", "Staging load test", "Audit log export"],
+    "mobile": ["Stop list redesign", "Photo compression", "Login with SSO", "Offline map tiles", "Crash reporting setup", "Signature capture", "Background sync", "Driver profile screen"],
+    "data": ["Shipments fact table", "Route dimension", "Hourly refresh job", "Data quality checks", "Cost dashboard", "Late delivery report", "Catalog setup", "Warehouse roles"],
+}
+history = []
+for team, per_sprint in velocity.items():
+    base = HIST_TITLES[team]
+    titles = iter([t for t in base] + [t + " follow-up" for t in base] + [t + " cleanup" for t in base])
+    n = 0
+    for sprint_key, v in per_sprint.items():
+        # split completed points into done stories, the gap into one carried-over story
+        done_parts = [8, 5, 5, 3, 3, 2, 2, 1, 1]
+        remaining, parts = v["completed"], []
+        for p in done_parts:
+            if remaining - p >= 0:
+                parts.append(p)
+                remaining -= p
+            if remaining == 0:
+                break
+        assert remaining == 0, (team, sprint_key)
+        for p in parts:
+            n += 1
+            history.append({"key": f"{team[:3].upper()}-H{n:02d}", "teamKey": team, "sprintKey": sprint_key, "title": next(titles), "storyPoints": p, "status": "Done"})
+        gap = v["committed"] - v["completed"]
+        if gap:
+            n += 1
+            history.append({"key": f"{team[:3].upper()}-H{n:02d}", "teamKey": team, "sprintKey": sprint_key, "title": next(titles) + " (carried over)", "storyPoints": gap, "status": "Not done"})
+
 dor = {
     "version": "1.0",
     "appliesTo": "Story-level work items before sprint commitment",
@@ -200,6 +230,7 @@ out = {
     "velocity": velocity,
     "releases": releases,
     "stories": [dict(s, teamKey=k) for k, ss in stories.items() for s in ss],
+    "historyStories": history,
 }
 
 with open(os.path.join(OUT, "northwind.json"), "w") as f:

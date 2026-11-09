@@ -1,4 +1,4 @@
-import type { Company, Sprint, Team } from "@/lib/types";
+import type { Company, Sprint, TeamConfig } from "@/lib/types";
 
 export interface MemberCapacity {
   name: string;
@@ -17,13 +17,15 @@ export interface TeamCapacity {
   members: MemberCapacity[];
   rawHours: number;
   focusHours: number;
+  /** Neither tracker exposes per-sprint capacity for the demo personas, so it comes from config/teams.json. */
+  source: "config";
 }
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
 /** hours = hoursPerDay x (workingDays - ptoDays); focusHours = rawHours x focusFactor. */
 export function computeCapacity(
-  team: Team,
+  team: TeamConfig,
   sprint: Sprint,
   company: Pick<Company, "focusFactor">,
 ): TeamCapacity {
@@ -48,5 +50,6 @@ export function computeCapacity(
     members,
     rawHours,
     focusHours: round1(rawHours * company.focusFactor),
+    source: "config",
   };
 }

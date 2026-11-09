@@ -870,5 +870,311 @@
       "status": "Backlog",
       "teamKey": "data"
     }
+  ],
+  "historyStories": [
+    {
+      "key": "PLA-H01",
+      "teamKey": "platform",
+      "sprintKey": "sprint-22",
+      "title": "Shipment v2 schema",
+      "storyPoints": 8,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H02",
+      "teamKey": "platform",
+      "sprintKey": "sprint-22",
+      "title": "Partner key management",
+      "storyPoints": 5,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H03",
+      "teamKey": "platform",
+      "sprintKey": "sprint-22",
+      "title": "Retry queue for webhooks",
+      "storyPoints": 5,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H04",
+      "teamKey": "platform",
+      "sprintKey": "sprint-22",
+      "title": "Tracking cache",
+      "storyPoints": 3,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H05",
+      "teamKey": "platform",
+      "sprintKey": "sprint-22",
+      "title": "Error budget alerts",
+      "storyPoints": 3,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H06",
+      "teamKey": "platform",
+      "sprintKey": "sprint-22",
+      "title": "Carrier lookup endpoint",
+      "storyPoints": 2,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H07",
+      "teamKey": "platform",
+      "sprintKey": "sprint-22",
+      "title": "Staging load test",
+      "storyPoints": 2,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H08",
+      "teamKey": "platform",
+      "sprintKey": "sprint-22",
+      "title": "Audit log export",
+      "storyPoints": 1,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H09",
+      "teamKey": "platform",
+      "sprintKey": "sprint-22",
+      "title": "Shipment v2 schema follow-up (carried over)",
+      "storyPoints": 5,
+      "status": "Not done"
+    },
+    {
+      "key": "PLA-H10",
+      "teamKey": "platform",
+      "sprintKey": "sprint-23",
+      "title": "Partner key management follow-up",
+      "storyPoints": 8,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H11",
+      "teamKey": "platform",
+      "sprintKey": "sprint-23",
+      "title": "Retry queue for webhooks follow-up",
+      "storyPoints": 5,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H12",
+      "teamKey": "platform",
+      "sprintKey": "sprint-23",
+      "title": "Tracking cache follow-up",
+      "storyPoints": 5,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H13",
+      "teamKey": "platform",
+      "sprintKey": "sprint-23",
+      "title": "Error budget alerts follow-up",
+      "storyPoints": 3,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H14",
+      "teamKey": "platform",
+      "sprintKey": "sprint-23",
+      "title": "Carrier lookup endpoint follow-up",
+      "storyPoints": 3,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H15",
+      "teamKey": "platform",
+      "sprintKey": "sprint-23",
+      "title": "Staging load test follow-up",
+      "storyPoints": 2,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H16",
+      "teamKey": "platform",
+      "sprintKey": "sprint-23",
+      "title": "Audit log export follow-up",
+      "storyPoints": 1,
+      "status": "Done"
+    },
+    {
+      "key": "PLA-H17",
+      "teamKey": "platform",
+      "sprintKey": "sprint-23",
+      "title": "Shipment v2 schema cleanup (carried over)",
+      "storyPoints": 3,
+      "status": "Not done"
+    },
+    {
+      "key": "MOB-H01",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-22",
+      "title": "Stop list redesign",
+      "storyPoints": 8,
+      "status": "Done"
+    },
+    {
+      "key": "MOB-H02",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-22",
+      "title": "Photo compression",
+      "storyPoints": 5,
+      "status": "Done"
+    },
+    {
+      "key": "MOB-H03",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-22",
+      "title": "Login with SSO",
+      "storyPoints": 5,
+      "status": "Done"
+    },
+    {
+      "key": "MOB-H04",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-22",
+      "title": "Offline map tiles",
+      "storyPoints": 3,
+      "status": "Done"
+    },
+    {
+      "key": "MOB-H05",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-22",
+      "title": "Crash reporting setup",
+      "storyPoints": 3,
+      "status": "Done"
+    },
+    {
+      "key": "MOB-H06",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-22",
+      "title": "Signature capture",
+      "storyPoints": 1,
+      "status": "Done"
+    },
+    {
+      "key": "MOB-H07",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-22",
+      "title": "Background sync (carried over)",
+      "storyPoints": 1,
+      "status": "Not done"
+    },
+    {
+      "key": "MOB-H08",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-23",
+      "title": "Driver profile screen",
+      "storyPoints": 8,
+      "status": "Done"
+    },
+    {
+      "key": "MOB-H09",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-23",
+      "title": "Stop list redesign follow-up",
+      "storyPoints": 5,
+      "status": "Done"
+    },
+    {
+      "key": "MOB-H10",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-23",
+      "title": "Photo compression follow-up",
+      "storyPoints": 5,
+      "status": "Done"
+    },
+    {
+      "key": "MOB-H11",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-23",
+      "title": "Login with SSO follow-up",
+      "storyPoints": 3,
+      "status": "Done"
+    },
+    {
+      "key": "MOB-H12",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-23",
+      "title": "Offline map tiles follow-up",
+      "storyPoints": 1,
+      "status": "Done"
+    },
+    {
+      "key": "MOB-H13",
+      "teamKey": "mobile",
+      "sprintKey": "sprint-23",
+      "title": "Crash reporting setup follow-up (carried over)",
+      "storyPoints": 2,
+      "status": "Not done"
+    },
+    {
+      "key": "DAT-H01",
+      "teamKey": "data",
+      "sprintKey": "sprint-22",
+      "title": "Shipments fact table",
+      "storyPoints": 8,
+      "status": "Done"
+    },
+    {
+      "key": "DAT-H02",
+      "teamKey": "data",
+      "sprintKey": "sprint-22",
+      "title": "Route dimension",
+      "storyPoints": 5,
+      "status": "Done"
+    },
+    {
+      "key": "DAT-H03",
+      "teamKey": "data",
+      "sprintKey": "sprint-22",
+      "title": "Hourly refresh job",
+      "storyPoints": 5,
+      "status": "Done"
+    },
+    {
+      "key": "DAT-H04",
+      "teamKey": "data",
+      "sprintKey": "sprint-22",
+      "title": "Data quality checks",
+      "storyPoints": 3,
+      "status": "Done"
+    },
+    {
+      "key": "DAT-H05",
+      "teamKey": "data",
+      "sprintKey": "sprint-23",
+      "title": "Cost dashboard",
+      "storyPoints": 8,
+      "status": "Done"
+    },
+    {
+      "key": "DAT-H06",
+      "teamKey": "data",
+      "sprintKey": "sprint-23",
+      "title": "Late delivery report",
+      "storyPoints": 5,
+      "status": "Done"
+    },
+    {
+      "key": "DAT-H07",
+      "teamKey": "data",
+      "sprintKey": "sprint-23",
+      "title": "Catalog setup",
+      "storyPoints": 5,
+      "status": "Done"
+    },
+    {
+      "key": "DAT-H08",
+      "teamKey": "data",
+      "sprintKey": "sprint-23",
+      "title": "Warehouse roles (carried over)",
+      "storyPoints": 2,
+      "status": "Not done"
+    }
   ]
 }

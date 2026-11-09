@@ -13,8 +13,9 @@
     "start": "next start",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "push:clickup": "node --env-file=.env.local scripts/push-clickup.ts",
-    "push:ado": "node --env-file=.env.local scripts/push-ado.ts"
+    "seed:clickup": "node --env-file=.env.local scripts/seed-clickup.ts",
+    "seed:ado": "node --env-file=.env.local scripts/seed-ado.ts",
+    "test:live": "vitest run --config vitest.live.config.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "^2.4.0",

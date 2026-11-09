@@ -7,11 +7,12 @@ export interface Member {
   ptoDays: Record<string, number>;
 }
 
-export interface Team {
+export interface TeamConfig {
   key: string;
   name: string;
   tracker: Tracker;
-  description: string;
+  clickup?: { folder: string };
+  azureDevops?: { areaPath: string };
   members: Member[];
 }
 
@@ -22,7 +23,6 @@ export interface Sprint {
   end: string;
   workingDays: number;
   state: string;
-  note?: string;
 }
 
 export interface Dependency {
@@ -31,6 +31,7 @@ export interface Dependency {
   resolved: boolean;
 }
 
+/** Common story shape both adapters return. */
 export interface Story {
   key: string;
   title: string;
@@ -40,38 +41,23 @@ export interface Story {
   hasUi: boolean;
   designLink: string | null;
   dependencies: Dependency[];
-  assignee: string;
-  releaseKey: string | null;
-  sprintKey: string;
+  assignee: string | null;
+  releaseName: string | null;
+  sprintKey: string | null;
   status: string;
   teamKey: string;
-  injectionTest?: boolean;
-}
-
-export interface Release {
-  key: string;
-  name: string;
-  date: string;
-  scope: string;
-  status: string;
-  teams: string[];
 }
 
 export interface Company {
   name: string;
-  note: string;
-  timezone: string;
   focusFactor: number;
   hoursPerDay: number;
 }
 
-export interface Dataset {
+export interface TeamsConfig {
   company: Company;
-  teams: Team[];
   sprints: Sprint[];
-  velocity: Record<string, Record<string, { committed: number; completed: number }>>;
-  releases: Release[];
-  stories: Story[];
+  teams: TeamConfig[];
 }
 
 export interface DorRule {
