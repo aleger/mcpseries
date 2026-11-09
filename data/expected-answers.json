@@ -1,0 +1,92 @@
+{
+  "platform": {
+    "stories": 9,
+    "notReady": [
+      "PLT-103",
+      "PLT-106",
+      "PLT-107",
+      "PLT-110"
+    ],
+    "warningsOnly": [
+      "PLT-109"
+    ],
+    "failures": {
+      "PLT-103": [
+        "DOR-2"
+      ],
+      "PLT-106": [
+        "DOR-3"
+      ],
+      "PLT-107": [
+        "DOR-4"
+      ],
+      "PLT-109": [
+        "DOR-1"
+      ],
+      "PLT-110": [
+        "DOR-5"
+      ]
+    },
+    "committedPoints": 41,
+    "readyPoints": 13,
+    "avgVelocity": 28.0,
+    "commitPctOfVelocity": 146,
+    "rawHours": 248,
+    "focusHours": 173.6
+  },
+  "mobile": {
+    "stories": 7,
+    "notReady": [
+      "MOB-203",
+      "MOB-207",
+      "MOB-210"
+    ],
+    "warningsOnly": [
+      "MOB-206"
+    ],
+    "failures": {
+      "MOB-203": [
+        "DOR-5"
+      ],
+      "MOB-206": [
+        "DOR-1"
+      ],
+      "MOB-207": [
+        "DOR-2"
+      ],
+      "MOB-210": [
+        "DOR-4"
+      ]
+    },
+    "committedPoints": 26,
+    "readyPoints": 15,
+    "avgVelocity": 23.5,
+    "commitPctOfVelocity": 111,
+    "rawHours": 266,
+    "focusHours": 186.2
+  },
+  "data": {
+    "stories": 5,
+    "notReady": [
+      "DAT-304",
+      "DAT-307"
+    ],
+    "warningsOnly": [],
+    "failures": {
+      "DAT-304": [
+        "DOR-1",
+        "DOR-2"
+      ],
+      "DAT-307": [
+        "DOR-3",
+        "DOR-4"
+      ]
+    },
+    "committedPoints": 25,
+    "readyPoints": 7,
+    "avgVelocity": 19.5,
+    "commitPctOfVelocity": 128,
+    "rawHours": 278,
+    "focusHours": 194.6
+  }
+}

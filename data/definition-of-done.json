@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "teams": {
+    "platform": [
+      "Code reviewed by one engineer",
+      "Unit and integration tests pass in CI",
+      "Acceptance criteria verified by QA",
+      "API docs updated",
+      "Deployed to staging behind a LaunchDarkly flag",
+      "Sentry alerts configured for new endpoints"
+    ],
+    "mobile": [
+      "Code reviewed by one engineer",
+      "Unit and UI tests pass in CI",
+      "Acceptance criteria verified on iOS and Android test devices",
+      "Accessibility scan passes",
+      "Build distributed to internal testers",
+      "Release notes drafted"
+    ],
+    "data": [
+      "Code reviewed by one engineer",
+      "dbt tests pass in CI",
+      "Acceptance criteria verified against sample data",
+      "Model documented in data catalog",
+      "Deployed to staging warehouse",
+      "Cost impact estimated"
+    ]
+  }
+}

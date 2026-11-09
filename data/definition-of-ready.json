@@ -1,0 +1,42 @@
+{
+  "version": "1.0",
+  "appliesTo": "Story-level work items before sprint commitment",
+  "rules": [
+    {
+      "id": "DOR-1",
+      "name": "User story format",
+      "check": "description starts with 'As a' and contains 'I want' and 'so that'",
+      "severity": "warning",
+      "fix": "Rewrite as: As a <role>, I want <capability>, so that <benefit>."
+    },
+    {
+      "id": "DOR-2",
+      "name": "Acceptance criteria",
+      "check": "at least 2 acceptance criteria",
+      "severity": "blocker",
+      "fix": "Add at least two testable acceptance criteria."
+    },
+    {
+      "id": "DOR-3",
+      "name": "Estimated and small enough",
+      "check": "storyPoints is set and between 1 and 8",
+      "severity": "blocker",
+      "fix": "Estimate, or split stories above 8 points."
+    },
+    {
+      "id": "DOR-4",
+      "name": "Dependencies resolved",
+      "check": "no dependency with resolved = false",
+      "severity": "blocker",
+      "fix": "Resolve the dependency or move the story to a later sprint."
+    },
+    {
+      "id": "DOR-5",
+      "name": "Design attached for UI work",
+      "check": "if hasUi is true, designLink is set",
+      "severity": "blocker",
+      "fix": "Attach the approved design link."
+    }
+  ],
+  "storyIsReadyWhen": "no blocker rule fails"
+}
