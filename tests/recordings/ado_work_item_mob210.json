@@ -1,0 +1,11 @@
+{
+  "fields": {
+    "System.Title": "MOB-210: Delay prediction banner",
+    "System.Description": "<p>As a driver, I want a banner, so that I can warn customers.</p><h3>Dependencies</h3><ul><li>DAT-307: Delay prediction API from Data team (resolved: false)</li></ul>",
+    "Microsoft.VSTS.Common.AcceptanceCriteria": "<ul><li>Banner shows</li><li>Dismissable</li></ul>",
+    "Microsoft.VSTS.Scheduling.StoryPoints": 3,
+    "System.Tags": "release-2027.01.2; ui; owner:Aisha Karim",
+    "System.State": "New"
+  },
+  "relations": [{ "rel": "Hyperlink", "url": "https://example.test/design" }]
+}

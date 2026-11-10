@@ -1,0 +1,12 @@
+{
+  "name": "DAT-307: Delay prediction API",
+  "description": "As a data engineer, I want an API, so that mobile can show delays.\n\nDependencies:\n- DAT-302: Telematics ingestion (resolved: false)\n\nReferenced by:\n- MOB-210 (Azure DevOps) depends on this story",
+  "status": { "status": "ready for development", "type": "custom" },
+  "tags": [{ "name": "release-2027.01.2" }, { "name": "ui" }],
+  "custom_fields": [
+    { "name": "Story Points", "value": "5" },
+    { "name": "Design Link", "value": null },
+    { "name": "Owner", "value": "Sam Rivera" }
+  ],
+  "checklists": [{ "name": "Acceptance Criteria", "items": [{ "name": "A" }, { "name": "B" }] }]
+}
