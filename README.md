@@ -20,10 +20,10 @@ Their servers read and write tickets. They do not know your capacity rules, your
 | --- | --- |
 | get_sprint_capacity | How many focus hours does a team have this sprint after PTO? |
 | check_definition_of_ready | Which stories are not ready, and why? Is the team overcommitted? |
-| list_release_dates | What ships when? |
-| compare_readiness | How do teams on different trackers compare? |
+| list_release_dates (v0.2) | What ships when? |
+| compare_readiness (v0.2) | How do teams on different trackers compare? |
 
-Also a `dod://team/{team}` resource and a `sprint-readiness-review` prompt.
+v0.2 also adds a `dod://team/{team}` resource and a `sprint-readiness-review` prompt. Every tool is read-only.
 
 ## Run locally
 
@@ -34,9 +34,19 @@ uv sync
 cp .env.example .env.local                  # add ClickUp and Azure DevOps tokens and IDs
 uv run python scripts/seed_clickup.py       # optional: build the Northwind demo in a test ClickUp space
 uv run python scripts/seed_ado.py           # optional: build the Northwind demo in a test Azure DevOps project
-uv run fastmcp run delivery_mcp/server.py --transport http --port 8000
+uv run uvicorn delivery_mcp.server:app --port 8000
 npx @modelcontextprotocol/inspector         # connect to http://localhost:8000/mcp
 ```
+
+## Tests
+
+```bash
+uv run pytest             # rules and adapters against recorded responses
+uv run pytest -m live     # live ClickUp and Azure DevOps demo workspaces (read-only)
+uv run pytest -m http     # POST /mcp against a local server, or MCP_URL=https://<deployment>/mcp
+```
+
+The seed scripts are the only code that writes to a tracker. `seed_ado.py` writes only what differs from the seed data, and `--check` shows the differences without writing. Both accept `--reset`.
 
 ## Connect to Claude
 
