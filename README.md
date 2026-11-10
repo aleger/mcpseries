@@ -11,8 +11,8 @@ Their servers read and write tickets. They do not know your capacity rules, your
 ## Spec and versions
 
 - MCP spec revision 2026-07-28 (stateless)
-- mcp-handler 2.x, @modelcontextprotocol/server 2.x, zod 4
-- Next.js on Vercel, Node 22.18 or later
+- Python 3.12, FastMCP 4 on the official mcp 2.x SDK
+- Deployed on Vercel's Python runtime
 
 ## Tools
 
@@ -30,12 +30,12 @@ Also a `dod://team/{team}` resource and a `sprint-readiness-review` prompt.
 The server reads live data from your ClickUp workspace and Azure DevOps project. It never writes to them.
 
 ```bash
-npm install
-cp .env.example .env.local   # add ClickUp and Azure DevOps tokens and IDs
-npm run seed:clickup         # optional: build the Northwind demo in a test ClickUp space
-npm run seed:ado             # optional: build the Northwind demo in a test Azure DevOps project
-npm run dev
-npx @modelcontextprotocol/inspector   # connect to http://localhost:3000/mcp
+uv sync
+cp .env.example .env.local                  # add ClickUp and Azure DevOps tokens and IDs
+uv run python scripts/seed_clickup.py       # optional: build the Northwind demo in a test ClickUp space
+uv run python scripts/seed_ado.py           # optional: build the Northwind demo in a test Azure DevOps project
+uv run fastmcp run delivery_mcp/server.py --transport http --port 8000
+npx @modelcontextprotocol/inspector         # connect to http://localhost:8000/mcp
 ```
 
 ## Connect to Claude
@@ -48,7 +48,7 @@ claude mcp add --transport http delivery-mcp https://<your-deployment>/mcp
 
 ## Auth
 
-v0.1 and v0.2 have no auth by design. Point them only at test workspaces with demo data. v0.3 adds OAuth with Clerk. Do not point v0.1 or v0.2 at real tracker data.
+v0.1 and v0.2 have no auth by design. Point them only at test workspaces with demo data. v0.3 adds sign-in with Microsoft Entra ID, and Azure DevOps reads run with the signed-in user's own permissions. Do not point v0.1 or v0.2 at real tracker data.
 
 ## Demo data
 
@@ -60,7 +60,7 @@ Northwind Logistics is a fictional company: three teams, Sprints 22 to 24, four 
 | --- | --- | --- |
 | v0.1 | 1. Concept | Capacity and DoR tools on live ClickUp and Azure DevOps data |
 | v0.2 | 2. Build | Release calendar, cross-tracker comparison, resource, prompt |
-| v0.3 | 3. Govern | OAuth, audit log, evals |
+| v0.3 | 3. Govern | Entra ID sign-in, audit log, evals |
 
 ## License
 
