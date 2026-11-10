@@ -1,11 +1,7 @@
 node_modules
-.next
 .env*.local
 .env
-*.tsbuildinfo
-next-env.d.ts
 __pycache__
-.next-test
 .vercel
 .env*
 !.env.example
@@ -13,3 +9,4 @@ __pycache__
 __pycache__
 .pytest_cache
 .ruff_cache
+.idea
