@@ -11,3 +11,4 @@ __pycache__
 .ruff_cache
 .idea
 .next-test
+CLAUDE.md
