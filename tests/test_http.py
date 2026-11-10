@@ -98,3 +98,9 @@ async def test_sprint_24_readiness_matches_expected(client, team):
     assert r["avgVelocity"] == exp["avgVelocity"]
     assert r["commitPctOfVelocity"] == exp["commitPctOfVelocity"]
     assert dependency_blockers_of(r) == exp["dependencyBlockers"]
+
+
+async def test_root_page_is_not_a_404(mcp_url):
+    res = httpx.get(mcp_url.removesuffix("/mcp") + "/", timeout=30)
+    assert res.status_code == 200
+    assert "/mcp" in res.text

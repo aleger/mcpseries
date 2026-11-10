@@ -6,6 +6,8 @@ from typing import Annotated, Any
 from fastmcp import FastMCP
 from fastmcp.exceptions import ToolError
 from pydantic import Field
+from starlette.requests import Request
+from starlette.responses import HTMLResponse
 
 from delivery_mcp import config, readiness
 from delivery_mcp.adapters import adapter_for
@@ -52,6 +54,14 @@ async def check_definition_of_ready(team: Team, sprint: Sprint) -> dict[str, Any
         return await readiness.check_definition_of_ready(adapter, team, sprint)
     except Exception as err:
         raise _client_error(err) from None
+
+
+@mcp.custom_route("/", methods=["GET"])
+async def home(request: Request) -> HTMLResponse:
+    return HTMLResponse(
+        '<main style="font-family:system-ui;padding:24px"><h1>delivery-mcp</h1>'
+        "<p>MCP endpoint: <code>/mcp</code>. Fictional Northwind Logistics demo data only.</p></main>"
+    )
 
 
 app = mcp.http_app(path="/mcp", stateless_http=True)
