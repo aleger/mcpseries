@@ -29,7 +29,7 @@ def _points(task: Json) -> float | None:
 
 
 def map_task(t: Json, team_key: str, sprint_key: str | None) -> Story | None:
-    """Map one ClickUp task to the common Story shape. None for tasks that are not seeded stories."""
+    """Map one ClickUp task to the common Story shape."""
     m = KEY_RE.match(str(t.get("name", "")))
     if not m:
         return None

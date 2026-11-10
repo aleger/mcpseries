@@ -16,7 +16,7 @@ POINTS = "Microsoft.VSTS.Scheduling.StoryPoints"
 
 
 def map_work_item(w: Json, team_key: str, sprint_key: str | None) -> Story | None:
-    """Map one Azure DevOps User Story to the common Story shape (None if not a seeded story)."""
+    """Map one Azure DevOps User Story to the common Story shape."""
     f = w["fields"]
     m = KEY_RE.match(str(f.get("System.Title", "")))
     if not m:
