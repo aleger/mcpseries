@@ -1,0 +1,36 @@
+[project]
+name = "delivery-mcp"
+version = "0.1.0"
+description = "MCP server that answers sprint readiness questions across ClickUp and Azure DevOps"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.9",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8",
+  "pytest-asyncio>=0.24",
+  "ruff>=0.8",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["."]
+markers = [
+  "live: calls the live ClickUp and Azure DevOps demo workspaces (opt-in: pytest -m live)",
+  "http: POSTs to /mcp on a running server or MCP_URL (opt-in: pytest -m http)",
+]
+addopts = "-m 'not live and not http'"
+
+[tool.ruff]
+line-length = 110
+extend-exclude = ["data", "app", "lib", "node_modules"]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
