@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     ado_org: str | None = None
     ado_project: str | None = None
     ado_pat: SecretStr | None = None
+    entra_tenant_id: str | None = None
+    entra_client_id: str | None = None
+    entra_client_secret: SecretStr | None = None
 
 
 @lru_cache
