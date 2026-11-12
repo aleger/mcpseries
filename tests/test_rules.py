@@ -1,10 +1,11 @@
 import pytest
 
 from delivery_mcp import config
+from delivery_mcp.adapters.http import TrackerError
 from delivery_mcp.models import Dependency, Story
 from delivery_mcp.readiness import check_definition_of_ready, get_sprint_capacity
 from delivery_mcp.rules.capacity import compute_capacity
-from delivery_mcp.rules.dor import check_story
+from delivery_mcp.rules.dor import check_story, summarize_readiness
 from tests.fixtures import EXPECTED, FixtureAdapter
 
 TEAMS = list(EXPECTED)
@@ -32,6 +33,24 @@ def test_capacity_matches_expected(team):
     assert c.focus_hours == pytest.approx(exp["focusHours"])
     assert c.source == "config"
     assert get_sprint_capacity(team, "sprint-24")["focusHours"] == pytest.approx(exp["focusHours"])
+
+
+def test_capacity_response_uses_camel_case_field_names():
+    result = get_sprint_capacity("mobile", "sprint-24")
+    assert list(result) == [
+        "team", "sprint", "workingDays", "focusFactor", "members", "rawHours", "focusHours", "source",
+    ]  # fmt: skip
+    assert result["members"]
+    for member in result["members"]:
+        assert list(member) == ["name", "role", "hoursPerDay", "ptoDays", "workingDays", "hours"]
+
+
+def test_member_hours_subtract_pto_days():
+    result = get_sprint_capacity("mobile", "sprint-24")
+    for member in result["members"]:
+        assert member["workingDays"] == result["workingDays"] - member["ptoDays"]
+        assert member["hours"] == member["hoursPerDay"] * member["workingDays"]
+    assert result["rawHours"] == sum(member["hours"] for member in result["members"])
 
 
 @pytest.mark.parametrize("team", TEAMS)
@@ -99,3 +118,59 @@ def test_dor4_same_tracker_and_external_are_not_cross_tool():
 
 def test_dor4_ignores_resolved_dependencies():
     assert blockers_for([Dependency(key="DAT-307", description="done", resolved=True)]) == []
+
+
+class StubAdapter:
+    """Returns the given stories and the same completed points for every earlier sprint."""
+
+    def __init__(self, stories: list[Story], completed_points: float = 0) -> None:
+        self.stories = stories
+        self.completed_points = completed_points
+
+    async def get_sprint_stories(self, team, sprint) -> list[Story]:
+        return self.stories
+
+    async def get_completed_points(self, team, sprint) -> float:
+        return self.completed_points
+
+
+async def test_stories_are_sorted_by_the_number_in_their_key():
+    keys = ["MOB-10", "MOB-9", "MOB-100", "MOB-1"]
+    stories = [BASE.model_copy(update={"key": key}) for key in keys]
+    result = await check_definition_of_ready(StubAdapter(stories), "mobile", "sprint-24")
+    assert [story["key"] for story in result["stories"]] == ["MOB-1", "MOB-9", "MOB-10", "MOB-100"]
+
+
+async def test_empty_sprint_reports_zero_points_and_no_stories():
+    result = await check_definition_of_ready(StubAdapter([], completed_points=20), "mobile", "sprint-24")
+    assert result["stories"] == []
+    assert result["notReady"] == []
+    assert (result["committedPoints"], result["readyPoints"]) == (0, 0)
+    assert (result["avgVelocity"], result["commitPctOfVelocity"]) == (20, 0)
+
+
+@pytest.mark.parametrize("completed_velocity", [[], [0, 0]])
+def test_no_velocity_history_reports_zero_instead_of_dividing_by_zero(completed_velocity):
+    summary = summarize_readiness([BASE], config.dor_rules(), completed_velocity)
+    assert summary.committed_points == 3
+    assert summary.avg_velocity == 0
+    assert summary.commit_pct_of_velocity == 0
+
+
+def test_story_failing_several_rules_lists_each_one():
+    story = BASE.model_copy(
+        update={"description": "Do the thing", "acceptance_criteria": [], "story_points": None}
+    )
+    check = check_story(story, config.dor_rules())
+    failed = sorted(failure.rule_id for failure in [*check.blockers, *check.warnings])
+    assert failed == ["DOR-1", "DOR-2", "DOR-3"]
+    assert check.ready is False
+
+
+async def test_tracker_errors_are_not_swallowed():
+    class FailingAdapter(StubAdapter):
+        async def get_completed_points(self, team, sprint) -> float:
+            raise TrackerError("Azure DevOps request failed (500).")
+
+    with pytest.raises(TrackerError, match="request failed"):
+        await check_definition_of_ready(FailingAdapter([BASE]), "mobile", "sprint-24")
