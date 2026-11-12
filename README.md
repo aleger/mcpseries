@@ -68,7 +68,7 @@ Northwind Logistics is a fictional company: three teams, Sprints 22 to 24, four 
 
 | Tag | Episode | Adds |
 | --- | --- | --- |
-| v0.1 | 1. Concept | Capacity and DoR tools on live ClickUp and Azure DevOps data |
+| v0.1 | 1. Concept | Readiness check on live ClickUp and Azure DevOps data, capacity from team config |
 | v0.2 | 2. Build | Release calendar, cross-tracker comparison, resource, prompt |
 | v0.3 | 3. Govern | Entra ID sign-in, audit log, evals |
 
