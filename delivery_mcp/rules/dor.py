@@ -41,54 +41,93 @@ class ReadinessSummary:
     commit_pct_of_velocity: int
 
 
-# Rule predicates keyed by rule id. Rule metadata (severity, fix text) comes from definition-of-ready.json.
+def _has_user_story_format(story: Story) -> bool:
+    description = story.description.strip()
+    return description.startswith("As a") and "I want" in description and "so that" in description
+
+
+def _has_acceptance_criteria(story: Story) -> bool:
+    return len(story.acceptance_criteria) >= 2
+
+
+def _has_sprint_sized_estimate(story: Story) -> bool:
+    return story.story_points is not None and 1 <= story.story_points <= 8
+
+
+def _has_no_open_dependencies(story: Story) -> bool:
+    return not any(dependency.resolved is False for dependency in story.dependencies)
+
+
+def _has_design_link_if_ui(story: Story) -> bool:
+    return not story.has_ui or bool(story.design_link)
+
+
+# One check per rule id. A check returns True when the story passes. The rule's name,
+# severity and fix text are not repeated here: they come from data/definition-of-ready.json.
 PREDICATES: dict[str, Callable[[Story], bool]] = {
-    "DOR-1": lambda s: (d := s.description.strip()).startswith("As a") and "I want" in d and "so that" in d,
-    "DOR-2": lambda s: len(s.acceptance_criteria) >= 2,
-    "DOR-3": lambda s: s.story_points is not None and 1 <= s.story_points <= 8,
-    "DOR-4": lambda s: not any(d.resolved is False for d in s.dependencies),
-    "DOR-5": lambda s: not s.has_ui or bool(s.design_link),
+    "DOR-1": _has_user_story_format,
+    "DOR-2": _has_acceptance_criteria,
+    "DOR-3": _has_sprint_sized_estimate,
+    "DOR-4": _has_no_open_dependencies,
+    "DOR-5": _has_design_link_if_ui,
 }
+
+
+def no_known_tracker(key: str) -> str | None:
+    """Default lookup for callers without team config: every dependency counts as external."""
+    return None
 
 
 def check_story(
     story: Story,
     rules: Sequence[DorRule],
-    tracker_of_key: TrackerOfKey = lambda _key: None,
+    tracker_of_key: TrackerOfKey = no_known_tracker,
     story_tracker: str | None = None,
 ) -> StoryCheck:
+    """Run every Definition of Ready rule against one story."""
     failures: list[RuleFailure] = []
+
     for rule in rules:
-        predicate = PREDICATES.get(rule.id)
-        if predicate is None:
+        passes = PREDICATES.get(rule.id)
+        if passes is None:
             raise ValueError(f"No evaluator for rule {rule.id}")
-        if predicate(story):
+        if passes(story):
             continue
+
         if rule.id != "DOR-4":
             failures.append(RuleFailure(rule.id, rule.name, rule.severity, rule.fix))
             continue
-        # One failure per unresolved dependency, so the reader sees what is blocking and where it lives.
-        for dep in (d for d in story.dependencies if not d.resolved):
-            dep_tracker = tracker_of_key(dep.key)
+
+        # The dependency rule reports one failure per unresolved dependency, so the reader
+        # sees what is blocking the story and where that work lives.
+        for dependency in story.dependencies:
+            if dependency.resolved:
+                continue
+            dependency_tracker = tracker_of_key(dependency.key)
+            is_cross_tool = dependency_tracker is not None and dependency_tracker != story_tracker
             failures.append(
                 RuleFailure(
                     rule.id,
                     rule.name,
                     rule.severity,
                     rule.fix,
-                    depends_on=dep.key,
-                    description=dep.description,
-                    cross_tool=dep_tracker is not None and dep_tracker != story_tracker,
+                    depends_on=dependency.key,
+                    description=dependency.description,
+                    cross_tool=is_cross_tool,
                 )
             )
-    blockers = [f for f in failures if f.severity == "blocker"]
+
+    blockers = [failure for failure in failures if failure.severity == "blocker"]
+    warnings = [failure for failure in failures if failure.severity == "warning"]
+
+    # Warnings are reported but do not stop a story from being ready.
     return StoryCheck(
         key=story.key,
         title=story.title,
         story_points=story.story_points,
         ready=not blockers,
         blockers=blockers,
-        warnings=[f for f in failures if f.severity == "warning"],
+        warnings=warnings,
     )
 
 
@@ -96,19 +135,34 @@ def summarize_readiness(
     stories: Sequence[Story],
     rules: Sequence[DorRule],
     completed_velocity: Sequence[float],
-    tracker_of_key: TrackerOfKey | None = None,
+    tracker_of_key: TrackerOfKey = no_known_tracker,
     story_tracker: str | None = None,
 ) -> ReadinessSummary:
-    lookup = tracker_of_key or (lambda _key: None)
-    checks = [check_story(s, rules, lookup, story_tracker) for s in stories]
-    committed = sum(c.story_points or 0 for c in checks)
-    ready = sum(c.story_points or 0 for c in checks if c.ready)
-    avg = sum(completed_velocity) / len(completed_velocity) if completed_velocity else 0.0
+    """Check every story, then compare the committed points with the team's recent velocity.
+
+    `completed_velocity` holds the points completed in each earlier sprint.
+    """
+    checks = [check_story(story, rules, tracker_of_key, story_tracker) for story in stories]
+
+    # A story without an estimate adds nothing to the totals. DOR-3 already reports it.
+    committed_points = sum(check.story_points or 0 for check in checks)
+    ready_points = sum(check.story_points or 0 for check in checks if check.ready)
+
+    # A team with no closed sprints, or none that completed any points, has no velocity
+    # to compare against. Report zero for both figures instead of dividing by zero.
+    avg_velocity = 0.0
+    if completed_velocity:
+        avg_velocity = sum(completed_velocity) / len(completed_velocity)
+
+    commit_pct_of_velocity = 0
+    if avg_velocity:
+        commit_pct_of_velocity = int(round_half_up(committed_points / avg_velocity * 100))
+
     return ReadinessSummary(
         stories=checks,
-        not_ready=[c.key for c in checks if not c.ready],
-        committed_points=committed,
-        ready_points=ready,
-        avg_velocity=avg,
-        commit_pct_of_velocity=int(round_half_up(committed / avg * 100)) if avg else 0,
+        not_ready=[check.key for check in checks if not check.ready],
+        committed_points=committed_points,
+        ready_points=ready_points,
+        avg_velocity=avg_velocity,
+        commit_pct_of_velocity=commit_pct_of_velocity,
     )
