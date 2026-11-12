@@ -1,23 +1,29 @@
-"""Shared plumbing for the read-only adapters: TTL cache, errors, response checks."""
+"""Shared plumbing for the read-only adapters: a short-lived cache, errors and response checks."""
 
 import time
-from collections.abc import Awaitable, Callable
 from typing import Any
 
 import httpx
 
+# One tool call can ask a tracker for the same thing more than once (the ClickUp folder
+# list, for example), so responses are kept per process for a minute.
 TTL_SECONDS = 60.0
 _cache: dict[str, tuple[float, Any]] = {}
 
 
-async def cached[T](key: str, load: Callable[[], Awaitable[T]]) -> T:
-    """Per-process 60 second cache so one tool call does not hit a tracker twice for the same request."""
-    hit = _cache.get(key)
-    if hit and time.monotonic() - hit[0] < TTL_SECONDS:
-        return hit[1]
-    value = await load()
-    _cache[key] = (time.monotonic(), value)
+def cache_get(key: str) -> Any | None:
+    """Return the cached value for `key`, or None if there is none or it has expired."""
+    entry = _cache.get(key)
+    if entry is None:
+        return None
+    stored_at, value = entry
+    if time.monotonic() - stored_at >= TTL_SECONDS:
+        return None
     return value
+
+
+def cache_set(key: str, value: Any) -> None:
+    _cache[key] = (time.monotonic(), value)
 
 
 def clear_cache() -> None:
@@ -29,17 +35,19 @@ class TrackerError(Exception):
 
 
 def require(value: str | None, name: str) -> str:
+    """Return a required setting, or fail with a message that names the missing variable."""
     if not value:
         raise TrackerError(f"Server is missing configuration ({name}).")
     return value
 
 
-def read_json(res: httpx.Response, service: str, credential: str, hint: str) -> Any:
-    """Parse a tracker response as JSON. Azure DevOps answers a rejected or missing PAT with
-    203 and an HTML sign-in page (which a status-only check accepts), so check the content type too."""
-    ctype = res.headers.get("content-type", "")
-    if res.status_code in (401, 403, 203) or "json" not in ctype:
+def read_json(response: httpx.Response, service: str, credential: str, hint: str) -> Any:
+    """Parse a tracker response as JSON, turning credential and HTTP failures into TrackerError."""
+    # Azure DevOps answers a rejected or missing PAT with status 203 and an HTML sign-in
+    # page. A status-only check would accept that, so the content type is checked as well.
+    content_type = response.headers.get("content-type", "")
+    if response.status_code in (401, 403, 203) or "json" not in content_type:
         raise TrackerError(f"{service} rejected the server's credentials. Check {credential} ({hint}).")
-    if res.is_error:
-        raise TrackerError(f"{service} request failed ({res.status_code}).")
-    return res.json()
+    if response.is_error:
+        raise TrackerError(f"{service} request failed ({response.status_code}).")
+    return response.json()
