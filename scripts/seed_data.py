@@ -17,26 +17,53 @@ SEED: Json = json.loads((ROOT / "data" / "northwind.json").read_text())
 
 
 def release_name(key: str | None) -> str | None:
-    return next((r["name"] for r in SEED["releases"] if r["key"] == key), None)
+    for release in SEED["releases"]:
+        if release["key"] == key:
+            return release["name"]
+    return None
 
 
 def sprint_name(key: str | None) -> str | None:
-    return next((s["name"] for s in SEED["sprints"] if s["key"] == key), None)
+    for sprint in SEED["sprints"]:
+        if sprint["key"] == key:
+            return sprint["name"]
+    return None
+
+
+def release_and_ui_tags(story: Json) -> list[str]:
+    """Tags both trackers put on a story. The adapters read the release name and the UI flag from them."""
+    tags = []
+    if story["releaseKey"]:
+        tags.append(f"release-{release_name(story['releaseKey'])}")
+    if story["hasUi"]:
+        tags.append("ui")
+    return tags
+
+
+def tracker_of_story(key: str) -> str | None:
+    """Tracker of the team that owns a story, or None for keys that are not in the seed data."""
+    team_key = None
+    for story in SEED["stories"]:
+        if story["key"] == key:
+            team_key = story["teamKey"]
+            break
+
+    for team in SEED["teams"]:
+        if team["key"] == team_key:
+            return team["tracker"]
+    return None
 
 
 def cross_tool_needed_by(story: Json) -> list[str]:
     """Keys of stories in the other tracker that depend on this story."""
+    own_tracker = tracker_of_story(story["key"])
 
-    def tracker(key: str) -> str | None:
-        team = next((s["teamKey"] for s in SEED["stories"] if s["key"] == key), None)
-        return next((t["tracker"] for t in SEED["teams"] if t["key"] == team), None)
-
-    mine = tracker(story["key"])
-    return [
-        s["key"]
-        for s in SEED["stories"]
-        if any(d["key"] == story["key"] for d in s["dependencies"]) and tracker(s["key"]) != mine
-    ]
+    dependents = []
+    for other in SEED["stories"]:
+        depends_on_story = any(dependency["key"] == story["key"] for dependency in other["dependencies"])
+        if depends_on_story and tracker_of_story(other["key"]) != own_tracker:
+            dependents.append(other["key"])
+    return dependents
 
 
 def need(name: str) -> str:
