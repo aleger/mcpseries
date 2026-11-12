@@ -13,33 +13,40 @@ TEAMS = list(EXPECTED)
 
 def dependency_blockers_of(result: dict) -> dict:
     """DOR-4 blockers of a check_definition_of_ready result, shaped like expected-answers.json."""
-    out = {}
-    for s in result["stories"]:
-        blockers = [
-            {k: b.get(k) for k in ("rule", "dependsOn", "description", "crossTool")}
-            for b in s["blockers"]
-            if b["rule"] == "DOR-4"
-        ]
-        if blockers:
-            out[s["key"]] = blockers
-    return out
+    fields = ("rule", "dependsOn", "description", "crossTool")
+    by_story = {}
+    for story in result["stories"]:
+        dependency_blockers = []
+        for blocker in story["blockers"]:
+            if blocker["rule"] == "DOR-4":
+                dependency_blockers.append({field: blocker.get(field) for field in fields})
+        if dependency_blockers:
+            by_story[story["key"]] = dependency_blockers
+    return by_story
 
 
 @pytest.mark.parametrize("team", TEAMS)
 def test_capacity_matches_expected(team):
-    exp = EXPECTED[team]
-    c = compute_capacity(config.get_team(team), config.get_sprint("sprint-24"), config.company())
-    assert c.raw_hours == exp["rawHours"]
-    assert c.focus_hours == pytest.approx(exp["focusHours"])
-    assert c.source == "config"
-    assert get_sprint_capacity(team, "sprint-24")["focusHours"] == pytest.approx(exp["focusHours"])
+    expected = EXPECTED[team]
+    capacity = compute_capacity(config.get_team(team), config.get_sprint("sprint-24"), config.company())
+    assert capacity.raw_hours == expected["rawHours"]
+    assert capacity.focus_hours == pytest.approx(expected["focusHours"])
+    assert capacity.source == "config"
+    assert get_sprint_capacity(team, "sprint-24")["focusHours"] == pytest.approx(expected["focusHours"])
 
 
 def test_capacity_response_uses_camel_case_field_names():
     result = get_sprint_capacity("mobile", "sprint-24")
     assert list(result) == [
-        "team", "sprint", "workingDays", "focusFactor", "members", "rawHours", "focusHours", "source",
-    ]  # fmt: skip
+        "team",
+        "sprint",
+        "workingDays",
+        "focusFactor",
+        "members",
+        "rawHours",
+        "focusHours",
+        "source",
+    ]
     assert result["members"]
     for member in result["members"]:
         assert list(member) == ["name", "role", "hoursPerDay", "ptoDays", "workingDays", "hours"]
@@ -55,22 +62,27 @@ def test_member_hours_subtract_pto_days():
 
 @pytest.mark.parametrize("team", TEAMS)
 async def test_definition_of_ready_matches_expected(team):
-    exp = EXPECTED[team]
-    r = await check_definition_of_ready(FixtureAdapter(), team, "sprint-24")
-    assert len(r["stories"]) == exp["stories"]
-    assert r["notReady"] == exp["notReady"]
-    assert r["committedPoints"] == exp["committedPoints"]
-    assert r["readyPoints"] == exp["readyPoints"]
-    assert r["avgVelocity"] == exp["avgVelocity"]
-    assert r["commitPctOfVelocity"] == exp["commitPctOfVelocity"]
-    failures = {
-        s["key"]: sorted(f["rule"] for f in [*s["blockers"], *s["warnings"]])
-        for s in r["stories"]
-        if s["blockers"] or s["warnings"]
-    }
-    assert failures == exp["failures"]
-    assert [s["key"] for s in r["stories"] if s["ready"] and s["warnings"]] == exp["warningsOnly"]
-    assert dependency_blockers_of(r) == exp["dependencyBlockers"]
+    expected = EXPECTED[team]
+    result = await check_definition_of_ready(FixtureAdapter(), team, "sprint-24")
+    stories = result["stories"]
+
+    assert len(stories) == expected["stories"]
+    assert result["notReady"] == expected["notReady"]
+    assert result["committedPoints"] == expected["committedPoints"]
+    assert result["readyPoints"] == expected["readyPoints"]
+    assert result["avgVelocity"] == expected["avgVelocity"]
+    assert result["commitPctOfVelocity"] == expected["commitPctOfVelocity"]
+
+    failed_rules = {}
+    for story in stories:
+        failures = [*story["blockers"], *story["warnings"]]
+        if failures:
+            failed_rules[story["key"]] = sorted(failure["rule"] for failure in failures)
+    assert failed_rules == expected["failures"]
+
+    warnings_only = [story["key"] for story in stories if story["ready"] and story["warnings"]]
+    assert warnings_only == expected["warningsOnly"]
+    assert dependency_blockers_of(result) == expected["dependencyBlockers"]
 
 
 def test_unknown_team_lists_valid_values():
@@ -94,26 +106,32 @@ BASE = Story(
 )  # fmt: skip
 
 
-def blockers_for(deps: list[Dependency]):
-    story = BASE.model_copy(update={"dependencies": deps})
+def blockers_for(dependencies: list[Dependency]):
+    story = BASE.model_copy(update={"dependencies": dependencies})
     return check_story(story, config.dor_rules(), config.tracker_of_key, "azure-devops").blockers
 
 
 def test_dor4_flags_dependency_in_other_tracker_as_cross_tool():
-    (b,) = blockers_for(
+    (blocker,) = blockers_for(
         [Dependency(key="DAT-307", description="Delay prediction API from Data team", resolved=False)]
     )
-    assert (b.rule_id, b.depends_on, b.description, b.cross_tool) == (
-        "DOR-4", "DAT-307", "Delay prediction API from Data team", True,
-    )  # fmt: skip
+    assert blocker.rule_id == "DOR-4"
+    assert blocker.depends_on == "DAT-307"
+    assert blocker.description == "Delay prediction API from Data team"
+    assert blocker.cross_tool is True
 
 
 def test_dor4_same_tracker_and_external_are_not_cross_tool():
-    bs = blockers_for([
-        Dependency(key="MOB-205", description="same tracker", resolved=False),
-        Dependency(key="SEC-12", description="external", resolved=False),
-    ])  # fmt: skip
-    assert [(b.depends_on, b.cross_tool) for b in bs] == [("MOB-205", False), ("SEC-12", False)]
+    blockers = blockers_for(
+        [
+            Dependency(key="MOB-205", description="same tracker", resolved=False),
+            Dependency(key="SEC-12", description="external", resolved=False),
+        ]
+    )
+    assert [(blocker.depends_on, blocker.cross_tool) for blocker in blockers] == [
+        ("MOB-205", False),
+        ("SEC-12", False),
+    ]
 
 
 def test_dor4_ignores_resolved_dependencies():

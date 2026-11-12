@@ -5,8 +5,8 @@ from typing import Any
 
 import httpx
 
-# One tool call can ask a tracker for the same thing more than once (the ClickUp folder
-# list, for example), so responses are kept per process for a minute.
+# Tracker responses are kept per process for a minute, so follow-up questions about
+# the same sprint do not hit the tracker again.
 TTL_SECONDS = 60.0
 _cache: dict[str, tuple[float, Any]] = {}
 

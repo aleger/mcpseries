@@ -13,16 +13,20 @@ _RELEASES = {r["key"]: r["name"] for r in _SEED["releases"]}
 
 class FixtureAdapter:
     async def get_sprint_stories(self, team: TeamConfig, sprint: Sprint) -> list[Story]:
-        out = []
-        for s in _SEED["stories"]:
-            if s["teamKey"] == team.key and s["sprintKey"] == sprint.key:
-                row = {k: v for k, v in s.items() if k != "releaseKey"}
-                out.append(Story.model_validate({**row, "releaseName": _RELEASES.get(s.get("releaseKey"))}))
-        return out
+        stories = []
+        for seed_story in _SEED["stories"]:
+            if seed_story["teamKey"] != team.key or seed_story["sprintKey"] != sprint.key:
+                continue
+            # The seed refers to a release by key. Story carries the release name instead.
+            fields = {name: value for name, value in seed_story.items() if name != "releaseKey"}
+            fields["releaseName"] = _RELEASES.get(seed_story.get("releaseKey"))
+            stories.append(Story.model_validate(fields))
+        return stories
 
     async def get_completed_points(self, team: TeamConfig, sprint: Sprint) -> float:
-        return sum(
-            h["storyPoints"]
-            for h in _SEED["historyStories"]
-            if h["teamKey"] == team.key and h["sprintKey"] == sprint.key and h["status"] == "Done"
-        )
+        total = 0.0
+        for history_story in _SEED["historyStories"]:
+            in_sprint = history_story["teamKey"] == team.key and history_story["sprintKey"] == sprint.key
+            if in_sprint and history_story["status"] == "Done":
+                total += history_story["storyPoints"]
+        return total
