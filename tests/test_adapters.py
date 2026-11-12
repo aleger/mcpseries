@@ -126,10 +126,10 @@ def ado_env(monkeypatch):
 
 
 async def test_ado_adapter_surfaces_203_through_a_request(ado_env):
-    transport = httpx.MockTransport(
-        lambda req: httpx.Response(203, headers={"content-type": "text/html"}, text="<html>Sign in</html>")
-    )
-    adapter = AzureDevOpsAdapter(transport)
+    def sign_in_page(req: httpx.Request) -> httpx.Response:
+        return httpx.Response(203, headers={"content-type": "text/html"}, text="<html>Sign in</html>")
+
+    adapter = AzureDevOpsAdapter(httpx.MockTransport(sign_in_page))
     with pytest.raises(TrackerError, match="Azure DevOps rejected the server's credentials"):
         await adapter.get_sprint_stories(config.get_team("mobile"), config.get_sprint("sprint-24"))
 

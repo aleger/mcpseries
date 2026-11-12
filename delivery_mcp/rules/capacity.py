@@ -31,17 +31,32 @@ class TeamCapacity:
 def compute_capacity(team: TeamConfig, sprint: Sprint, company: Company) -> TeamCapacity:
     """hours = hoursPerDay x (workingDays - ptoDays); focusHours = rawHours x focusFactor."""
     members = []
-    for m in team.members:
-        pto = m.pto_days.get(sprint.key, 0)
-        days = max(0, sprint.working_days - pto)
-        members.append(MemberCapacity(m.name, m.role, m.hours_per_day, pto, days, m.hours_per_day * days))
-    raw = sum(m.hours for m in members)
+    for member in team.members:
+        pto_days = member.pto_days.get(sprint.key, 0)
+        # More PTO than the sprint has working days still means zero hours, not negative.
+        working_days = max(0, sprint.working_days - pto_days)
+        members.append(
+            MemberCapacity(
+                name=member.name,
+                role=member.role,
+                hours_per_day=member.hours_per_day,
+                pto_days=pto_days,
+                working_days=working_days,
+                hours=member.hours_per_day * working_days,
+            )
+        )
+
+    raw_hours = sum(member.hours for member in members)
+
+    # The focus factor is the share of raw hours a team can expect to spend on sprint work.
+    focus_hours = round_half_up(raw_hours * company.focus_factor, 1)
+
     return TeamCapacity(
         team=team.key,
         sprint=sprint.key,
         working_days=sprint.working_days,
         focus_factor=company.focus_factor,
         members=members,
-        raw_hours=raw,
-        focus_hours=round_half_up(raw * company.focus_factor, 1),
+        raw_hours=raw_hours,
+        focus_hours=focus_hours,
     )
