@@ -30,31 +30,44 @@ def company() -> Company:
 
 
 def get_team(key: str) -> TeamConfig:
-    k = key.lower()
-    for t in load_config().teams:
-        if k in (t.key, t.name.lower()):
-            return t
-    valid = ", ".join(t.key for t in load_config().teams)
+    """Find a team by key or display name, ignoring case."""
+    teams = load_config().teams
+    wanted = key.lower()
+    for team in teams:
+        if wanted in (team.key, team.name.lower()):
+            return team
+
+    valid = ", ".join(team.key for team in teams)
     raise NotFoundError(f'Unknown team "{key}". Valid teams: {valid}.')
 
 
 def get_sprint(key: str) -> Sprint:
-    norm = "-".join(key.lower().split())
-    for s in load_config().sprints:
-        if s.key == norm:
-            return s
-    valid = ", ".join(s.key for s in load_config().sprints)
+    """Find a sprint by key. The display name works too: "Sprint 24" is read as "sprint-24"."""
+    sprints = load_config().sprints
+    wanted = "-".join(key.lower().split())
+    for sprint in sprints:
+        if sprint.key == wanted:
+            return sprint
+
+    valid = ", ".join(sprint.key for sprint in sprints)
     raise NotFoundError(f'Unknown sprint "{key}". Valid sprints: {valid}.')
 
 
 def tracker_of_key(key: str) -> str | None:
     """Tracker that holds a story key (by its prefix), or None for keys outside both trackers."""
     prefix = key.split("-")[0].upper()
-    return next((t.tracker for t in load_config().teams if t.key_prefix == prefix), None)
+    for team in load_config().teams:
+        if team.key_prefix == prefix:
+            return team.tracker
+    return None
 
 
 def prior_closed_sprints(sprint: Sprint) -> list[Sprint]:
     """Up to the two closed sprints before `sprint`, oldest first."""
+    # Sprints are listed in date order in config/teams.json.
     sprints = load_config().sprints
-    idx = next(i for i, s in enumerate(sprints) if s.key == sprint.key)
-    return [s for s in sprints[:idx] if s.state == "closed"][-2:]
+    sprint_keys = [candidate.key for candidate in sprints]
+    earlier_sprints = sprints[: sprint_keys.index(sprint.key)]
+
+    closed = [earlier for earlier in earlier_sprints if earlier.state == "closed"]
+    return closed[-2:]
