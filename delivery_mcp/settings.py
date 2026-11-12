@@ -1,6 +1,3 @@
-"""Tracker credentials and IDs. One parser (pydantic-settings, python-dotenv syntax) everywhere.
-Real environment variables win over .env.local. Never print or log these values."""
-
 from functools import lru_cache
 
 from pydantic import SecretStr

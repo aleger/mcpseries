@@ -1,5 +1,3 @@
-"""FastMCP server: sprint readiness tools. Read-only; the trackers stay the source of truth."""
-
 import logging
 from typing import Annotated, Any
 

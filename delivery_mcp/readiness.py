@@ -1,5 +1,3 @@
-"""The logic behind check_definition_of_ready and get_sprint_capacity. server.py only wraps these."""
-
 import asyncio
 import re
 from typing import Any

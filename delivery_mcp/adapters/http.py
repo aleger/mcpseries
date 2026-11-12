@@ -1,5 +1,3 @@
-"""Shared plumbing for the read-only adapters: a short-lived cache, errors and response checks."""
-
 import time
 from typing import Any
 

@@ -1,6 +1,3 @@
-"""Team, sprint and capacity config plus the DoR rule set. Story data never comes from here:
-it comes from the trackers through delivery_mcp.adapters on every request."""
-
 import json
 from functools import lru_cache
 from pathlib import Path
